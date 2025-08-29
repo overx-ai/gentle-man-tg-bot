@@ -1,0 +1,28 @@
+[Unit]
+Description=Gentle Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/jack/JACK/gentle-man-tg-bot
+Environment="PATH=/home/jack/.local/bin:/usr/bin"
+Environment="UV_SYSTEM_PYTHON=1"
+ExecStart=/home/jack/.local/bin/uv run python main.py
+Restart=always
+RestartSec=10
+
+# Security settings (some are not available for user services)
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gentle-bot
+
+[Install]
+WantedBy=default.target
