@@ -100,7 +100,7 @@ class GentleBot:
         try:
             await application.bot.send_message(
                 chat_id=settings.admin_user_id,
-                text=f"🟢 **Bot Started**\n\n"
+                text=f"🟢 *Bot Started*\n\n"
                      f"Bot: @{bot_info.username}\n"
                      f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
                      f"Status: All systems operational",
@@ -117,7 +117,7 @@ class GentleBot:
         try:
             await application.bot.send_message(
                 chat_id=settings.admin_user_id,
-                text=f"🔴 **Bot Stopping**\n\n"
+                text=f"🔴 *Bot Stopping*\n\n"
                      f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
                      f"Status: Shutting down gracefully",
                 parse_mode='Markdown'

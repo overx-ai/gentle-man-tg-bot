@@ -37,7 +37,7 @@ def main():
                 bot = Bot(token=settings.telegram_bot_token)
                 await bot.send_message(
                     chat_id=settings.admin_user_id,
-                    text=f"💥 **Bot Crashed**\n\n"
+                    text=f"💥 *Bot Crashed*\n\n"
                          f"Error: {str(e)[:200]}\n"
                          f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                     parse_mode='Markdown'
