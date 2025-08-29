@@ -92,6 +92,7 @@ class MessageHandler:
         is_reply_to_bot = False
         if message.reply_to_message and message.reply_to_message.from_user:
             is_reply_to_bot = message.reply_to_message.from_user.id == context.bot.id
+            logger.info(f"Reply check: replied_to_user_id={message.reply_to_message.from_user.id}, bot_id={context.bot.id}, is_reply_to_bot={is_reply_to_bot}")
         
         # Store message in database with enhanced tracking
         async with get_session() as session:

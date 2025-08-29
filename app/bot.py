@@ -98,10 +98,12 @@ class GentleBot:
         
         # Send startup notification to admin
         try:
+            # Escape underscores for Markdown to prevent parsing errors
+            bot_username = bot_info.username.replace('_', '\\_')
             await application.bot.send_message(
                 chat_id=settings.admin_user_id,
                 text=f"🟢 *Bot Started*\n\n"
-                     f"Bot: @{bot_info.username}\n"
+                     f"Bot: @{bot_username}\n"
                      f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
                      f"Status: All systems operational",
                 parse_mode='Markdown'
