@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     # Bot Configuration
     message_history_limit: int = Field(default=100, env='MESSAGE_HISTORY_LIMIT')
     bot_response_frequency: int = Field(default=5, env='BOT_RESPONSE_FREQUENCY')
+    admin_user_id: int = Field(default=66395090, env='ADMIN_USER_ID')
     
     # Logging
     log_level: str = Field(default='INFO', env='LOG_LEVEL')

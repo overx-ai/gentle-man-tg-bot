@@ -1,5 +1,6 @@
 import logging
 import asyncio
+from datetime import datetime
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -94,10 +95,35 @@ class GentleBot:
         
         # Initialize AI service session
         await self.ai_service.__aenter__()
+        
+        # Send startup notification to admin
+        try:
+            await application.bot.send_message(
+                chat_id=settings.admin_user_id,
+                text=f"🟢 **Bot Started**\n\n"
+                     f"Bot: @{bot_info.username}\n"
+                     f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                     f"Status: All systems operational",
+                parse_mode='Markdown'
+            )
+        except Exception as e:
+            logger.warning(f"Could not send startup notification: {e}")
     
     async def shutdown(self, application: Application):
         """Cleanup on shutdown"""
         logger.info("Shutting down bot...")
+        
+        # Send shutdown notification to admin
+        try:
+            await application.bot.send_message(
+                chat_id=settings.admin_user_id,
+                text=f"🔴 **Bot Stopping**\n\n"
+                     f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                     f"Status: Shutting down gracefully",
+                parse_mode='Markdown'
+            )
+        except Exception as e:
+            logger.warning(f"Could not send shutdown notification: {e}")
         
         # Close AI service session
         if self.ai_service:
