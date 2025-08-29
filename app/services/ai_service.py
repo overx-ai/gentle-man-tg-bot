@@ -153,6 +153,11 @@ class GeminiService:
                     if response.status == 200:
                         data = await response.json()
                         return data['choices'][0]['message']['content']
+                    elif response.status == 401:
+                        # Authentication error - don't retry
+                        error_text = await response.text()
+                        logger.error(f"API authentication error 401: {error_text}")
+                        return "Извините, возникла проблема с аутентификацией API. Пожалуйста, обратитесь к администратору."
                     elif response.status == 429:
                         # Rate limited - retry with exponential backoff
                         if attempt < max_retries - 1:

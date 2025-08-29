@@ -124,17 +124,17 @@ class DailyMessageScheduler:
                 .limit(5)
             )
             recent_messages = result.scalars().all()
-            
-            # Get chat context
-            chat_context = await self.vector_store.get_chat_context(chat_id, limit=10)
-            
-            # Generate a personalized message
-            await self._generate_and_send_message(
-                chat_id, 
-                selected_user, 
-                recent_messages,
-                chat_context
-            )
+        
+        # Get chat context (outside of session to avoid connection issues)
+        chat_context = await self.vector_store.get_chat_context(chat_id, limit=10)
+        
+        # Generate a personalized message
+        await self._generate_and_send_message(
+            chat_id, 
+            selected_user, 
+            recent_messages,
+            chat_context
+        )
     
     async def _generate_and_send_message(self, chat_id: int, user: User, 
                                         recent_messages: list, chat_context: list):
