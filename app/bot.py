@@ -14,6 +14,7 @@ from .config import settings
 from .database import init_database, close_database
 from .services.ai_service import GeminiService
 from .services.vector_store import VectorStore
+from .services.scheduler import DailyMessageScheduler
 from .handlers.message_handler import MessageHandler as CustomMessageHandler
 
 # Configure logging
@@ -35,6 +36,8 @@ class GentleBot:
         self.ai_service = None
         self.vector_store = None
         self.message_handler = None
+        self.scheduler = None
+        self.scheduler_task = None
     
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle /start command"""
@@ -80,6 +83,29 @@ class GentleBot:
                 parse_mode='Markdown'
             )
     
+    async def daily_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handle /daily command - force send daily message (admin only)"""
+        if update.effective_user.id != settings.admin_user_id:
+            await update.message.reply_text("⛔ Эта команда доступна только администратору")
+            return
+        
+        chat_id = update.effective_chat.id
+        if chat_id > 0:
+            await update.message.reply_text("📝 Эта команда работает только в групповых чатах")
+            return
+        
+        await update.message.reply_text("🎲 Выбираю случайного пользователя...")
+        
+        try:
+            if self.scheduler:
+                await self.scheduler.force_send_daily_message(chat_id)
+                await update.message.reply_text("✅ Ежедневное сообщение отправлено!")
+            else:
+                await update.message.reply_text("❌ Планировщик не инициализирован")
+        except Exception as e:
+            logger.error(f"Error in daily command: {e}")
+            await update.message.reply_text(f"❌ Ошибка: {str(e)}")
+    
     async def post_init(self, application: Application):
         """Initialize bot after application is built"""
         # Get bot info
@@ -95,6 +121,15 @@ class GentleBot:
         
         # Initialize AI service session
         await self.ai_service.__aenter__()
+        
+        # Initialize and start scheduler
+        self.scheduler = DailyMessageScheduler(
+            bot=application.bot,
+            ai_service=self.ai_service,
+            vector_store=self.vector_store
+        )
+        self.scheduler_task = asyncio.create_task(self.scheduler.start())
+        logger.info("Daily message scheduler started")
         
         # Send startup notification to admin
         try:
@@ -114,6 +149,16 @@ class GentleBot:
     async def shutdown(self, application: Application):
         """Cleanup on shutdown"""
         logger.info("Shutting down bot...")
+        
+        # Stop scheduler
+        if self.scheduler:
+            self.scheduler.stop()
+            if self.scheduler_task:
+                self.scheduler_task.cancel()
+                try:
+                    await self.scheduler_task
+                except asyncio.CancelledError:
+                    pass
         
         # Send shutdown notification to admin
         try:
@@ -170,6 +215,7 @@ class GentleBot:
         self.app.add_handler(CommandHandler("start", self.start_command))
         self.app.add_handler(CommandHandler("help", self.help_command))
         self.app.add_handler(CommandHandler("stats", self.stats_command))
+        self.app.add_handler(CommandHandler("daily", self.daily_command))
         
         # Add handler for new chat members (when bot is added to group)
         self.app.add_handler(
