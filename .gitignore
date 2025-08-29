@@ -149,6 +149,13 @@ logs/
 *.db
 backups/
 temp/
+data/
+vector_store/
+*.index
+*.pkl
+
+# UV lock file
+uv.lock
 
 # Docker
 docker-compose.override.yml

@@ -1,1 +1,0 @@
-# Tests for gentle-man-tg-bot
