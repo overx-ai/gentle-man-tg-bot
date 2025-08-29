@@ -1,0 +1,32 @@
+[Unit]
+Description=gentle-man-tg-bot
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=bot
+Group=bot
+WorkingDirectory=/home/bot/gentle-man-tg-bot
+Environment="PATH=/home/bot/gentle-man-tg-bot/venv/bin"
+ExecStart=/home/bot/gentle-man-tg-bot/venv/bin/python -m main
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/bot/gentle-man-tg-bot
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gentle-man-tg-bot
+
+[Install]
+WantedBy=multi-user.target
